@@ -4,6 +4,7 @@ import UIKit
 final class ReviewsViewModel: NSObject {
 
     /// Замыкание, вызываемое при изменении `state`.
+    /// Попробовать заюзать Combine
     var onStateChange: ((State) -> Void)?
 
     private var state: State
@@ -81,10 +82,14 @@ private extension ReviewsViewModel {
     func makeReviewItem(_ review: Review) -> ReviewItem {
         let reviewText = review.text.attributed(font: .text)
         let created = review.created.attributed(font: .created, color: .created)
+        let nameText = (review.first_name + " " + review.last_name).attributed(font: .username)
+        let rating = review.rating
         let item = ReviewItem(
             reviewText: reviewText,
             created: created,
-            onTapShowMore: showMoreReview
+            onTapShowMore: showMoreReview,
+            nameText: nameText,
+            rating: rating
         )
         return item
     }

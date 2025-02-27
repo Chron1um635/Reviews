@@ -38,15 +38,17 @@ final class RatingRenderer {
     private let config: RatingRendererConfig
     private var images: [Int: UIImage]
     private let imageRenderer: UIGraphicsImageRenderer
+    let frameSize: CGSize
 
     init(
         config: RatingRendererConfig,
         images: [Int: UIImage],
-        imageRenderer: UIGraphicsImageRenderer
+        frameSize: CGSize
     ) {
         self.config = config
         self.images = images
-        self.imageRenderer = imageRenderer
+        self.imageRenderer = UIGraphicsImageRenderer(size: frameSize)
+        self.frameSize = frameSize
     }
 
 }
@@ -60,7 +62,7 @@ extension RatingRenderer {
             width: (config.starImage.size.width + config.spacing) * CGFloat(config.ratingRange.upperBound) - config.spacing,
             height: config.starImage.size.height
         )
-        self.init(config: config, images: [:], imageRenderer: UIGraphicsImageRenderer(size: size))
+        self.init(config: config, images: [:], frameSize: size)
     }
 
     func ratingImage(_ rating: Int) -> UIImage {

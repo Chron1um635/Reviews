@@ -35,7 +35,7 @@ extension ReviewCellConfig: TableCellConfig {
     func update(cell: UITableViewCell) {
         guard let cell = cell as? ReviewCell else { return }
         cell.reviewTextLabel.attributedText = reviewText
-        cell.reviewTextLabel.numberOfLines = maxLines
+        cell.reviewTextLabel.numberOfLines = Layout.showMore ? 0 : maxLines
         cell.createdLabel.attributedText = created
         cell.config = self
         cell.userNameLabel.attributedText = nameText
@@ -124,6 +124,7 @@ private extension ReviewCell {
         contentView.addSubview(showMoreButton)
         showMoreButton.contentVerticalAlignment = .fill
         showMoreButton.setAttributedTitle(Config.showMoreText, for: .normal)
+        showMoreButton.addTarget(self, action: #selector(self.showMoreButtonPressed), for: .touchUpInside)
     }
     
     func setupAvatarImageView() {
@@ -139,6 +140,11 @@ private extension ReviewCell {
     
     func setupRatingImageView() {
         contentView.addSubview(reviewRatingImageView)
+    }
+    
+    @objc func showMoreButtonPressed() {
+        Layout.showMore.toggle()
+        
     }
 }
 
@@ -156,6 +162,10 @@ private final class ReviewCellLayout {
 
     private static let photoSize = CGSize(width: 55.0, height: 66.0)
     private static let showMoreButtonSize = Config.showMoreText.size()
+    
+    // MARK: - Логическая переменная для кнопки
+    
+    fileprivate static var showMore = false
 
     // MARK: - Фреймы
 
@@ -238,11 +248,19 @@ private final class ReviewCellLayout {
             let actualTextHeight = config.reviewText.boundingRect(width: width).size.height
             // Показываем кнопку "Показать полностью...", если максимально возможная высота текста больше текущей.
             showShowMoreButton = config.maxLines != .zero && actualTextHeight > currentTextHeight
-
-            reviewTextLabelFrame = CGRect(
-                origin: CGPoint(x: maxX, y: maxY),
-                size: config.reviewText.boundingRect(width: width, height: currentTextHeight).size
-            )
+            
+            if showShowMoreButton && Layout.showMore {
+                reviewTextLabelFrame = CGRect(
+                    origin: CGPoint(x: maxX, y: maxY),
+                    size: config.reviewText.boundingRect(width: width, height: actualTextHeight).size
+                )
+                showShowMoreButton = false
+            } else {
+                reviewTextLabelFrame = CGRect(
+                    origin: CGPoint(x: maxX, y: maxY),
+                    size: config.reviewText.boundingRect(width: width, height: currentTextHeight).size
+                )
+            }
             maxY = reviewTextLabelFrame.maxY + reviewTextToCreatedSpacing
         }
 
